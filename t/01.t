@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More tests => 
-24; 
+34; 
 # 'no_plan';
 BEGIN { 
     use_ok('IO::Capture::Stdout::Extended')
@@ -45,15 +45,39 @@ $screen_lines = $capture->all_screen_lines;
 is($screen_lines, 2, "correct no. of lines printed to screen");
 @all_screen_lines = $capture->all_screen_lines;
 is($all_screen_lines[0], 
-    "The quick brown fox jumped over ... a less adept fox\n", 
+    "The quick brown fox jumped over ... a less adept fox", 
     "line correctly printed to screen");
 is($all_screen_lines[1], 
-    "The quick red fox jumped over ... the garden wall\n", 
+    "The quick red fox jumped over ... the garden wall", 
     "line correctly printed to screen");
 
 $capture->start;
 print_fox_trailing();
 $capture->stop;
+$screen_lines = $capture->all_screen_lines;
+is($screen_lines, 2, "correct no. of lines printed to screen");
+@all_screen_lines = $capture->all_screen_lines;
+is($all_screen_lines[1], 
+    "The quick red fox jumped over ... ",
+    "line correctly printed to screen");
+
+$capture->start();
+print_fox_blank();
+$capture->stop();
+is($capture->statements, 4, 
+    "number of print statements is correct");
+$screen_lines = $capture->all_screen_lines;
+is($screen_lines, 3, "correct no. of lines printed to screen");
+@all_screen_lines = $capture->all_screen_lines;
+is($all_screen_lines[1], 
+    "",
+    "line correctly printed to screen");
+
+$capture->start();
+print_fox_empty();
+$capture->stop();
+is($capture->statements, 4, 
+    "number of print statements is correct");
 $screen_lines = $capture->all_screen_lines;
 is($screen_lines, 2, "correct no. of lines printed to screen");
 @all_screen_lines = $capture->all_screen_lines;
@@ -76,10 +100,10 @@ $screen_lines = $capture->all_screen_lines;
 is($screen_lines, 4, "correct no. of lines printed to screen");
 @all_screen_lines = $capture->all_screen_lines;
 is($all_screen_lines[0], 
-    "alpha\n", 
+    "alpha", 
     "line correctly printed to screen");
 is($all_screen_lines[1], 
-    "beta\n", 
+    "beta", 
     "line correctly printed to screen");
 
 my @week = (
@@ -116,6 +140,28 @@ $regex = qr/French:\s+(.*?)\n/s;
 ok(eq_array( [ $capture->matches($regex) ], \@predicted ), 
     "all predicted matches found");
 
+$capture->start();
+print_fox_double();
+$capture->stop();
+is($capture->statements, 4, 
+    "number of print statements is correct");
+$screen_lines = $capture->all_screen_lines;
+is($screen_lines, 3, "correct no. of lines printed to screen");
+# above test fails because one of the print statements
+# contains two newlines
+# bug in CPAN!!!
+
+$capture->start();
+print_greek_double();
+$capture->stop();
+is($capture->statements, 2, 
+    "number of print statements is correct");
+$screen_lines = $capture->all_screen_lines;
+is($screen_lines, 5, "correct no. of lines printed to screen");
+# above test fails because one of the print statements
+# contains two newlines
+# bug in CPAN!!!
+
 ##### subroutines containing dummy print statements #####
 
 sub print_fox {
@@ -138,6 +184,27 @@ sub print_fox_trailing {
     print "The quick red fox jumped over ... ";
 }
 
+sub print_fox_blank {
+    print "The quick brown fox jumped over ... ";
+    print "a less adept fox\n";
+    print "\n";
+    print "The quick red fox jumped over ... ";
+}
+
+sub print_fox_empty {
+    print "The quick brown fox jumped over ... ";
+    print "a less adept fox\n";
+    print "";
+    print "The quick red fox jumped over ... ";
+}
+
+sub print_fox_double {
+    print "The quick brown fox jumped over ... ";
+    print "a less adept fox\n\n";
+    print "Furthermore, ";
+    print "the quick red fox jumped again.\n";
+}
+
 sub print_greek {
     local $_;
     print "$_\n" for (qw| alpha beta gamma delta |);
@@ -149,6 +216,11 @@ sub print_greek_long {
         print $_;
         print "\n";
     }
+}
+
+sub print_greek_double {
+    print "alpha\nbeta\ngamma\ndelta";
+    print "\nepsilon\n";
 }
 
 sub print_week {

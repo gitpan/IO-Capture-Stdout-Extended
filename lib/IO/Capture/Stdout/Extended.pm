@@ -1,5 +1,5 @@
 package IO::Capture::Stdout::Extended;
-$VERSION = 0.04; # as of 03/13/2005
+$VERSION = 0.06; # as of 03/13/2005
 use strict;
 use warnings;
 use base 'IO::Capture::Stdout';
@@ -41,21 +41,9 @@ sub _matches_engine {
 sub all_screen_lines {
     my $self = shift;
     my @screen_lines;
-    my $str = '';
-
-    for my $statement (@{$self->{'IO::Capture::messages'}}) {
-        if ($statement =~ /\n$/s) {
-            $str .= $statement;
-	    push(@screen_lines, $str);
-	    $str = '';
-        } else {
-            $str .= $statement;
-        }
-    }
-    push(@screen_lines, $str) if $str;
+    @screen_lines = split(/\n/, join('', @{$self->{'IO::Capture::messages'}}));
     return wantarray ? @screen_lines : scalar(@screen_lines);
 }
-
 
 1;
 
@@ -260,9 +248,9 @@ This pitfall can be avoided by using C<all_screen_lines()> below.
 =item * Scalar Context
 
 Returns the number of lines which would normally be counted by eye on 
-STDOUT.  This number is less than or equal to the number of C<print()> 
-statements found in the captured output and avoids the 'pitfall' found
-when using C<statements()> above.
+STDOUT.  This number is not necessarily equal to the number of C<print()> 
+statements found in the captured output.  This method avoids the 'pitfall' 
+found when using C<statements()> above.
 
     $capture->start();
     print_greek_long();
@@ -273,24 +261,24 @@ when using C<statements()> above.
 =item * List Context
 
 Returns an array holding lines as normally viewed on STDOUT.  The size
-of this array is less than or equal to the number of C<print()>
-statements found in the captured output and avoids the 'pitfall' found
-when using C<statements()> above.
+of this array is not necessarily equal to the number of C<print()>
+statements found in the captured output.  This method avoids the 
+'pitfall' found when using C<statements()> above.
 
     $capture->start();
     print_greek_long();
     $capture->stop();
     @all_screen_lines = $capture->all_screen_lines;
     is($all_screen_lines[0], 
-        "alpha\n", 
+        "alpha", 
         "line correctly printed to screen");
     is($all_screen_lines[1], 
-        "beta\n", 
+        "beta", 
         "line correctly printed to screen");
 
-Any newline (C<\n>) appearing at the end of a screen line is I<included>
+Any newline (C<\n>) appearing at the end of a screen line is I<not> included
 in the list of lines returned by this method, I<i.e.,> the lines are
-unchomped.
+chomped.
 
 =back
 

@@ -1,5 +1,13 @@
 Revision history for Perl module IO::Capture::Stdout::Extended
 
+0.06 Sun Mar 13 17:37:19 EST 2005
+    - Corrected one documentation error: 'unchomped' -> 'chomped'.
+
+0.05 Sun Mar 13 17:01:21 EST 2005
+    - Corrected logical flaw in all_screen_lines so that print
+statements which contain more than one newline character are 
+correctly counted as more than one screen line.
+
 0.04 Sun Mar 13 13:37:24 EST 2005
     - Added method all_screen_lines() so that accurate tests of the 
 number of lines normally observed by eye on STDOUT can be conducted.  
