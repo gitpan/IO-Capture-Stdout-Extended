@@ -1,0 +1,17 @@
+Revision history for Perl module IO::Capture::Stdout::Extended
+
+0.03 Tue Mar  1 14:50:01 EST 2005
+    - Following correspondence with Mark Reynolds, co-author and CPAN 
+maintainer of IO::Capture, this version is first uploaded to CPAN.
+Slight changes to documentation.
+
+0.02 Sun Feb 13 17:02:15 EST 2005
+    - Renamed IO::Capture::Stdout::Extended.  Based on suggestions made 
+on perl.qa newsgroup and study of IO::Capture documentation, interface 
+was revised and made object-oriented.  Tests and documentation 
+extensively revised.
+
+0.01 Thu Feb 10 18:37:00 2005
+    - original version; created by ExtUtils::ModuleMaker 0.3207
+
+

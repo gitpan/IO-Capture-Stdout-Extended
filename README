@@ -1,0 +1,14 @@
+README for Perl extension IO::Capture::Stdout::Extended
+
+To install this module, you must already have installed Perl 
+extension IO::Capture, available from CPAN.
+
+To install, call the following from the command-prompt:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If you are on Windows, you should probably use 'nmake' rather than 'make'.
+
