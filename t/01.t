@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More tests => 
-15; 
+24; 
 # 'no_plan';
 BEGIN { 
     use_ok('IO::Capture::Stdout::Extended')
@@ -9,6 +9,7 @@ BEGIN {
 
 my ($capture, $matches, @matches, %matches, $matchesref, $regex );
 my ($predicted, @predicted); 
+my ($screen_lines, @all_screen_lines);
 
 $capture = IO::Capture::Stdout::Extended->new();
 isa_ok($capture, 'IO::Capture::Stdout::Extended');
@@ -27,10 +28,12 @@ is($capture->grep_print_statements("fox"), 2,
     "correct no. of print statements grepped");
 %matches = map { $_, 1 } $capture->grep_print_statements("fox");
 is(keys %matches, 2, "correct no. of print statements grepped");
-ok($matches{'The quick brown fox jumped over ...'}, 
+ok($matches{'The quick brown fox jumped over ... '}, 
     'print statement correctly grepped');
-ok($matches{'The quick red fox jumped over ...'}, 
+ok($matches{'The quick red fox jumped over ... '}, 
     'print statement correctly grepped');
+$screen_lines = $capture->all_screen_lines;
+is($screen_lines, 1, "correct no. of lines printed to screen");
 
 $capture->start;
 print_fox_long();
@@ -38,6 +41,25 @@ $capture->stop;
 $matches = $capture->grep_print_statements("fox");
 is($capture->grep_print_statements("fox"), 3, 
     "correct no. of print statements grepped");
+$screen_lines = $capture->all_screen_lines;
+is($screen_lines, 2, "correct no. of lines printed to screen");
+@all_screen_lines = $capture->all_screen_lines;
+is($all_screen_lines[0], 
+    "The quick brown fox jumped over ... a less adept fox\n", 
+    "line correctly printed to screen");
+is($all_screen_lines[1], 
+    "The quick red fox jumped over ... the garden wall\n", 
+    "line correctly printed to screen");
+
+$capture->start;
+print_fox_trailing();
+$capture->stop;
+$screen_lines = $capture->all_screen_lines;
+is($screen_lines, 2, "correct no. of lines printed to screen");
+@all_screen_lines = $capture->all_screen_lines;
+is($all_screen_lines[1], 
+    "The quick red fox jumped over ... ",
+    "line correctly printed to screen");
 
 $capture->start();
 print_greek();
@@ -50,6 +72,15 @@ print_greek_long();
 $capture->stop();
 is($capture->statements, 8, 
     "number of print statements is correct");
+$screen_lines = $capture->all_screen_lines;
+is($screen_lines, 4, "correct no. of lines printed to screen");
+@all_screen_lines = $capture->all_screen_lines;
+is($all_screen_lines[0], 
+    "alpha\n", 
+    "line correctly printed to screen");
+is($all_screen_lines[1], 
+    "beta\n", 
+    "line correctly printed to screen");
 
 my @week = (
     [ qw| Monday     Lundi    Lunes     | ],
@@ -88,17 +119,23 @@ ok(eq_array( [ $capture->matches($regex) ], \@predicted ),
 ##### subroutines containing dummy print statements #####
 
 sub print_fox {
-    print "The quick brown fox jumped over ...";
+    print "The quick brown fox jumped over ... ";
     print "garden wall";
-    print "The quick red fox jumped over ...";
+    print "The quick red fox jumped over ... ";
     print "garden wall";
 }
 
 sub print_fox_long {
-    print "The quick brown fox jumped over ...";
+    print "The quick brown fox jumped over ... ";
     print "a less adept fox\n";
-    print "The quick red fox jumped over ...";
+    print "The quick red fox jumped over ... ";
     print "the garden wall\n";
+}
+
+sub print_fox_trailing {
+    print "The quick brown fox jumped over ... ";
+    print "a less adept fox\n";
+    print "The quick red fox jumped over ... ";
 }
 
 sub print_greek {

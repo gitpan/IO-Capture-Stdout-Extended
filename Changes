@@ -1,5 +1,11 @@
 Revision history for Perl module IO::Capture::Stdout::Extended
 
+0.04 Sun Mar 13 13:37:24 EST 2005
+    - Added method all_screen_lines() so that accurate tests of the 
+number of lines normally observed by eye on STDOUT can be conducted.  
+(Avoids pitfall of multiple 'print' statements per screen line buried 
+inside subroutines which print to STDOUT.)  Added appropriate tests.
+
 0.03 Tue Mar  1 14:50:01 EST 2005
     - Following correspondence with Mark Reynolds, co-author and CPAN 
 maintainer of IO::Capture, this version is first uploaded to CPAN.
